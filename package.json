@@ -1,0 +1,21 @@
+{
+  "name": "lista_de_exercicios_s03_fullstack_fmt",
+  "version": "1.0.0",
+  "description": "Mini-projeto de criação de uma API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "API",
+    "cadastro",
+    "de",
+    "produtos",
+    "mini-projeto"
+  ],
+  "author": "William Monte de Moura",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
