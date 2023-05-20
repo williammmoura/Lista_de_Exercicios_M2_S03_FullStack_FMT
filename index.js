@@ -15,6 +15,42 @@ const dadosJSON = (caminhoArquivoJSON) => {
     }
 } 
 
+// Função responsável por receber os dados enviados em uma solicitação POST
+const dadosEnviadosNoPOST = (request, Callback) =>{
+    // String vazia será usada para acumular os dados recebidos da solicitação POST
+    let dados = ""
+    // "request.on" -> registra um callback no evento "data"
+    request.on("data", (chunk) => {
+        dados += chunk
+    })
+    request.on("end", () => {
+        try{
+            const dadosObjeto = JSON.parse(dados)
+            callback(dadosObjeto)
+        }catch(erro){
+            console.error("Erro ao analisar os dados do POST: ", erro)
+            callback(null)
+        }
+    })
+}
+
+const salvarDadosJSON = (dados, caminhoArquivoJSON, callback) => {
+    try{
+        const dadosJSON = JSON.stringify(dados)
+        fs.writeFile(caminhoArquivoJSON, dadosJSON, "utf8", (erro) => {
+            if(erro){
+                console.error("Erro ao salvar os dados no arquivo JSON: ", erro)
+                callback(false)
+            }else{
+                callback(true)
+            }
+        })
+    }catch(erro){
+        console.error("Erro ao converter os dados para JSON: ", erro)
+    }
+}
+
+
 // Criando o servido HTTP
 const server = http.createServer((request, response) => {
     //Lógica da Função Callback.
