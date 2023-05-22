@@ -15,25 +15,6 @@ const dadosJSON = (caminhoArquivoJSON) => {
     }
 } 
 
-// Função responsável por receber os dados enviados em uma solicitação POST
-const dadosEnviadosNoPOST = (request, Callback) =>{
-    // String vazia será usada para acumular os dados recebidos da solicitação POST
-    let dados = ""
-    // "request.on" -> registra um callback no evento "data"
-    request.on("data", (chunk) => {
-        dados += chunk
-    })
-    request.on("end", () => {
-        try{
-            const dadosObjeto = JSON.parse(dados)
-            callback(dadosObjeto)
-        }catch(erro){
-            console.error("Erro ao analisar os dados do POST: ", erro)
-            callback(null)
-        }
-    })
-}
-
 const salvarDadosJSON = (dados, caminhoArquivoJSON, callback) => {
     try{
         const dadosJSON = JSON.stringify(dados)
@@ -57,6 +38,7 @@ const server = http.createServer((request, response) => {
     switch(request.method){
         case "GET":
             //Lógica do GET.
+            //Lógica para a rota "/dados"
             if(request.url === "/dados"){
                 const caminhoArquivoJSON = "./dados.json"
                 const dados = dadosJSON(caminhoArquivoJSON)
@@ -68,14 +50,36 @@ const server = http.createServer((request, response) => {
                     response.writeHead(500,{"Content-Type":"text/plain"})
                     response.end("Erro ao ler o dados.")
                 }
+            //Lógica para rota não encontrada
             }else{
                 response.writeHead(404,{"Content-Type": "text/plain"})
                 response.end("Rota não encontrada")
             }
             break
-        
+            
             case "POST":
-            //Lógica do POST.
+            // Essa variável será usada para acumular os dados recebidos na solicitação POST.
+            let dados = ""
+
+            request.on("data", (chunk) => {
+                dados += chunk
+            });
+
+            request.on("end", () => {
+                // Caminho do arquivo JSON onde os dados serão salvos.
+                const caminhoArquivoJSON = "./dados.json"
+                const dadosObjeto = JSON.parse(dados)
+
+                salvarDadosJSON(dadosObjeto, caminhoArquivoJSON, (sucesso) => {
+                    if (sucesso) {
+                        response.writeHead(200, {"Content-Type": "text/plain"})
+                        response.end("Dados salvos com sucesso!")
+                    } else {
+                        response.writeHead(500, {"Content-Type": "text/plain"})
+                        response.end("Erro ao salvar os dados.")
+                    }
+                })
+            })
             break
     }
 })
